@@ -4,6 +4,7 @@
 <style>
     .container{
         margin-left: 50px;
+        margin-top: -5em;
     }
     .pemasukan{
         margin-left: 10rem;
@@ -81,6 +82,14 @@ foreach($lihats as $lolz){
 
 $total = $pemasukan - $pengeluaran;
 ?>
+<a href="#" class="notifikasi"><i class="fas fa-bell" style="color:white; margin-left: 95%; margin-top: 20px"></i></a>
+<div class="sub-notifikasi" style="background:white; width: 20%; padding: 10px; border-radius: 5px; margin-left: 76%; display: none; position: relative; z-index: 2">
+    <b>Notifikasi</b>
+    <hr style="border: 1px solid black">
+    @foreach($datas4 as $d)
+    <b>{{$d->pengguna->nama_pengguna}}</b> {{$d->status}}<br>
+    @endforeach
+</div>
 <div class="container">
 <div class="pemasukan">
 <a style="text-decoration: none; color: white;" href="/pemasukan">
@@ -147,4 +156,12 @@ $total = $pemasukan - $pengeluaran;
   @endforeach
 </table>
 </center>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('.notifikasi').click(function(){
+            $(this).next('.sub-notifikasi').slideToggle();
+        });
+    })
+</script>
 @endsection

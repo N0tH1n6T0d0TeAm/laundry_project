@@ -61,6 +61,19 @@ tr:nth-child(even) {
         @php
             $no = 1;
             $total_harga = 0;
+            $pemasukan = 0;
+            $pengeluaran = 0;
+
+            foreach($lihat as $lol){
+                $pemasukan += $lol->total_bayar;
+            }
+
+            foreach($lihats as $lolz){
+                $pengeluaran += $lolz->hargaz;
+            }
+
+            $total = $pemasukan - $pengeluaran;
+
 
             function tgl_lol($tanggal){
                 $bulan =array( 
@@ -104,6 +117,15 @@ tr:nth-child(even) {
             <th></th>
             <th></th>
             <th style="color: black;">Rp. {{number_format($total_harga)}}</th>
+        </tr>
+
+        <tr>
+            <th style="color: black;">Total Sekarang</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th style="color: black;">Rp. {{number_format($total)}}</th>
         </tr>
     </table>
 

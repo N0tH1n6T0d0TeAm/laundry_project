@@ -156,6 +156,13 @@ Route::group(['middleware' => ['auth', 'ceklevel:admin,kasir,owner']], function 
 
     Route::get('pemasukan_search', [Laundry::class, 'search_laporan_pemasukan']);
     
+    Route::view('laporan_pengeluaran','laporan_pengeluaran');
+
+    Route::get('laporan_pengeluaran',[Laundry::class,'data_outlet']);
+
+    Route::view('laporan_pengeluaran_outlet','laporan_pengeluaran_outlet');
+    Route::get('laporan_pengeluaran_outlet/{id}',[Laundry::class,'pengs_outs']);
+    
 });
 
 

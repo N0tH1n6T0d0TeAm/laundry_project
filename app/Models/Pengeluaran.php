@@ -11,4 +11,8 @@ class Pengeluaran extends Model
     protected $table = 'pengeluaran';
 
     protected $primaryKey = 'id_pengeluaran';
+
+    public function outf(){
+        return $this->belongsTo(Outlet::class,'outlet_png');
+    }
 }

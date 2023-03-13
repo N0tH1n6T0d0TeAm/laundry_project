@@ -71,6 +71,7 @@ tr:nth-child(even) {
     <br><br>
 <div class="tampil">
     <h2 style="background: #21ff5c; width: 400px; border-radius: 5px; font-size: 28px">{{session('berhasil')}}</h2>
+    <h2 style="background: #dc3545; width: 400px; border-radius: 5px; font-size: 28px">{{session('error')}}</h2>
     <table width="900px" style="text-align: center; background: #a19d9d; color: white">
 
 

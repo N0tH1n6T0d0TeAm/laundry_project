@@ -395,11 +395,18 @@
                     <p>Laporan Pemasukan</p>
                   </a>
                 </li>
+
+                <li class="nav-item">
+                  <a href="/laporan_pengeluaran" class="nav-link">
+                    <i class="fas fa-file nav-icon"></i>
+                    <p>Laporan Pengeluaran</p>
+                  </a>
+                </li>
                </li>
 
 
           <li class="nav-item">
-           
+          
           </li>
           <li class="nav-item">
            
@@ -826,7 +833,7 @@
     <h2>Perhatian!</h2>
        <div class="content">
            <div class="container">
-               <form action="/tambah_out" method="POST" style="margin-left: 30rem; margin-top: 9rem; color: black;  transition: all 0.5s ease-out;background: white;height: 250px">
+               <form action="/tambah_out" method="POST" style="margin-left: 15rem; width: 50%; margin-top: 9rem; color: black;  transition: all 0.5s ease-out;background: white;height: 250px">
                    @csrf
                    <div style="margin-left: 10px;">
                    <h2 style="color: red; font-weight: 400">Perhatian!</h2>

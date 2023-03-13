@@ -53,9 +53,35 @@ tr:nth-child(even) {
 <div class="utama">
     <br>
     <h2 style="margin-right: 30em;">Pengeluaran</h2>
-    <a href="/laporan_pengeluaran" style="margin-left: 50em; margin-top: -4em;" class="btn btn-primary">Tambah Pengeluaran</a>
+    <a href="#tambah" style="margin-left: 50em; margin-top: -4em;" class="btn btn-primary">Tambah Pengeluaran</a>
 </div>
 
+<!-- Tambah -->
+<div class="overlay" id="tambah">
+    <div class="wrapper">
+        <h2>Pengluaran</h2>
+       
+        <div class="content">
+            <div class="container">
+            <a href="#" class="close">&times</a>
+                <form action="/tambahPengeluaran" method="POST" style="margin-left: 20rem; margin-top: 7rem; color: black;  transition: all 0.5s ease-out;background: white;height: 430px">
+                    @csrf
+                    <div style="margin-left: 10px;">
+                    <h2>Pengeluaran</h2>
+                    <hr>
+                    <label> Masukan Harga</label><br>
+                    <input class="form-control" type="text" name="harga" placeholder="Masukan Harga" required><br>
+                    <label>Tanggal Mulai Pengeluaran</label>
+                    <input type="date" class="form-control" name="tanggal">
+                    <label> Masukan Alasan</label><br>
+                    <textarea class="form-control" style="height: 90px;" type="text" name="alasan" required></textarea><br>
+                    <input style="margin-left: 700px;" class="btn btn-primary" type="submit" value="Tambah"><br>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <h2 style="background: #21ff5c; width: 400px; border-radius: 5px; font-size: 28px">{{session('berhasil')}}</h2>
@@ -63,7 +89,6 @@ tr:nth-child(even) {
 
     <tr>
         <th>No</th>
-        <th>Outlet</th>
         <th>Tanggal</th>
         <th>Harga</th>
         <th>Alasan</th>
@@ -79,7 +104,6 @@ tr:nth-child(even) {
     @endphp
     <tr>
         <td>{{$no++}}</td>
-        <td>{{$key->outf->nama_outlet}}</td>
         <td>{{tgl_indo($key->tanggal)}}</td>
         <td>Rp.{{number_format($key->hargaz)}}</td>
         <td>{{$key->alasan}}</td>
@@ -88,7 +112,6 @@ tr:nth-child(even) {
    
     <tr>
         <th>Total</th>
-        <th></th>
         <th></th>
         <th></th>
         <th>Rp.{{number_format($total)}}</th>

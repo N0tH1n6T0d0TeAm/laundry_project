@@ -97,6 +97,18 @@ return $pecahkan[2].' '.$bulan[(int)$pecahkan[1]].' '.$pecahkan[0];
 @php 
 $no = 1;
 $pemasukan = 0;
+$pengeluaran = 0;
+
+foreach($lihatz as $lol){
+    $pemasukan += $lol->total_bayar;
+}
+
+foreach($lihatz as $lolz){
+    $pengeluaran += $lolz->hargaz;
+}
+
+$total = $pemasukan - $pengeluaran;
+
 @endphp
 
     @foreach($lihatz as $key)
@@ -109,11 +121,17 @@ $pemasukan = 0;
             <td>Rp.{{number_format($key->total_bayar)}}</td>
         </tr>
     @endforeach
-
+<tr>
     <th>Total Pemasukan</th>
     <th></th>
     <th>Rp.{{number_format($pemasukan)}}</th>
-
+    </tr>
+    
+    <tr>
+    <th>Total Sekarang</th>
+    <th></th>
+    <th>Rp.{{number_format($total)}}</th>
+    </tr> 
 </table>
 <br><br>
 <button id="downloadexcel" class="btn btn-success" style="margin-left: -3em;">Download</button>

@@ -9,19 +9,38 @@ use Illuminate\Http\Request;
 use App\Models\Pelanggan;
 use App\Models\Outlet;
 use App\Models\Paket;
-use App\Models\Pengguna;
+use App\Models\Jumlah_Transaksi;
+use App\Models\LogActive;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Auth;
 class Laundry extends Controller
 {
     //
     public function tambah_pelanggan(Request $req){
-        $table = new Pelanggan;
-        $table->nama_pel = $req->nama_pelanggan;
-        $table->alamat = $req->alamat_pelanggan;
-        $table->no_telp = $req->no_telp;
-        $table->save();
-        return redirect()->back()->with("berhasil", "Berhasil Menambahkan");
+        DB::begintransaction();
+
+        try{
+            $table = new Pelanggan;
+            $table->nama_pel = $req->nama_pelanggan;
+            $table->alamat = $req->alamat_pelanggan;
+            $table->no_telp = $req->no_telp;
+            $table->save();
+
+            DB::commit();
+
+            $table = new LogActive;
+            $table->id_users = auth()->user()->id_pengguna;
+            $table->status = "Menambah Pelanggan";
+            $table->save();
+
+            return redirect()->back()->with("berhasil", "Berhasil Menambahkan");
+        }catch(\Exception $e){
+            DB::rollBack();
+
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat menambahkan pelanggan: '.$e->getMessage());
+        }
+        
     }
 
     public function daftar_pelanggan(Request $req){
@@ -49,12 +68,22 @@ class Laundry extends Controller
         $update->alamat = $req->alamat_pelanggan;
         $update->no_telp = $req->no_telp;
         $update->update();
+
+        $table = new LogActive;
+        $table->id_users = auth()->user()->id_pengguna;
+        $table->status = "Mengupdate Pelanggan";
+        $table->save();
         return back();
     }
 
     public function hapus($id){
         $kill = Pelanggan::find($id);
         $kill->delete();
+
+        $table = new LogActive;
+        $table->id_users = auth()->user()->id_pengguna;
+        $table->status = "Menghapus Pelanggan";
+        $table->save();
         return redirect()->back();
     }
 
@@ -65,6 +94,11 @@ class Laundry extends Controller
         $table->nama_outlet = $req->nama_outlet;
         $table->alamat_outlet = $req->alamat_outlet;
         $table->no_telp = $req->no_telp;
+        $table->save();
+
+        $table = new LogActive;
+        $table->id_users = auth()->user()->id_pengguna;
+        $table->status = "Menambah Outlet";
         $table->save();
         return redirect()->back()->with("berhasil", "Berhasil Menambahkan");
     }
@@ -94,12 +128,22 @@ class Laundry extends Controller
         $tables->alamat_outlet = $req->alamat_outlet;
         $tables->no_telp = $req->no_telp;
         $tables->update();
+
+        $table = new LogActive;
+        $table->id_users = auth()->user()->id_pengguna;
+        $table->status = "Mengupdate Outlet";
+        $table->save();
         return back();
     }
 
     public function kill_outlet($id){
         $tables = Outlet::find($id);
         $tables->delete();
+
+        $table = new LogActive;
+        $table->id_users = auth()->user()->id_pengguna;
+        $table->status = "Menghapus Data Outlet";
+        $table->save();
         return back();
     }
 
@@ -121,6 +165,11 @@ public function tambah_paket(Request $req){
         $tables->id_outlet = $req->outlet;
         $tables->harga = $req->harga;
         $tables->save();
+
+        $table = new LogActive;
+        $table->id_users = auth()->user()->id_pengguna;
+        $table->status = "Menambah Paket Laundry";
+        $table->save();
         return back()->with("berhasil", "Berhasil Menambahkan");
 }
 
@@ -161,12 +210,22 @@ public function update_paket(Request $req){
         $tables->id_outlet = $req->input('outlet');
         $tables->harga = $req->input('harga');
         $tables->update();
+
+        $table = new LogActive;
+        $table->id_users = auth()->user()->id_pengguna;
+        $table->status = "Mengupdate Data Outlet";
+        $table->save();
         return back();
 }
 
 public function kill_paket($id){
         $table = Paket::find($id);
         $table->delete();
+
+        $table = new LogActive;
+        $table->id_users = auth()->user()->id_pengguna;
+        $table->status = "Menghapus Data Outlet";
+        $table->save();
         return back();
 }
 
@@ -183,6 +242,11 @@ public function tambah_pengguna(Request $req){
         $table->role = $req->role;
         $table->email = $req->email;
         $table->password = bcrypt($req->password);
+        $table->save();
+
+        $table = new LogActive;
+        $table->id_users = auth()->user()->id_pengguna;
+        $table->status = "Menambah Data Pengguna";
         $table->save();
         return back()->with("berhasil", "Berhasil Menambahkan");
 
@@ -214,12 +278,22 @@ public function update_pengguna(Request $req){
         $table->email = $req->input('email');
         $table->password = bcrypt($req->input('password'));
         $table->update();
+
+        $table = new LogActive;
+        $table->id_users = auth()->user()->id_pengguna;
+        $table->status = "Mengupdate Pengguna";
+        $table->save();
         return back();
 }
 
 public function kill_pengguna($id){
         $tables = User::find($id);
         $tables->delete();
+
+        $table = new LogActive;
+        $table->id_users = auth()->user()->id_pengguna;
+        $table->status = "Menghapus Pengguna";
+        $table->save();
         return back();
 }
 
@@ -268,6 +342,9 @@ public function tambah_transaksi(Request $req){
         $nama_paket = explode(":", $data["jenis"])[0];
         $harga_paket = explode(":", $data["jenis"])[1];
 
+        $totals= 0;
+        $input_total = $harga_paket + $totals;
+
         $kode_pel = explode(":", $data["nama_pelanggan"])[0];
         $nama_pel = explode(":", $data["nama_pelanggan"])[1];
         
@@ -302,6 +379,16 @@ public function tambah_transaksi(Request $req){
         $transaksi_detail->batas_waktu = $data['batas_transaksi'];
         $transaksi_detail->tanggal_bayar = $data['tanggal_bayar'];
         $transaksi_detail->save();
+
+        $jumlah_transaksi = new Jumlah_Transaksi;
+        $jumlah_transaksi->id_outletzzzs = $data['outlet'];
+        $jumlah_transaksi->total_transaksi = $input_total;
+        $jumlah_transaksi->save();
+
+        $table = new LogActive;
+        $table->id_users = auth()->user()->id_pengguna;
+        $table->status = "Melakukan Tambah Transaksi";
+        $table->save();
 
         return redirect('data_transaksi');
 }
@@ -362,6 +449,11 @@ public function update_transaksi(Request $req){
         $table->status = $req->status;
         $table->pembayaran = $req->pembayaran;
         $table->update();
+
+        $table = new LogActive;
+        $table->id_users = auth()->user()->id_pengguna;
+        $table->status = "Mengupdate Data Transaksi";
+        $table->save();
         return back();
         
 }
@@ -369,15 +461,22 @@ public function update_transaksi(Request $req){
 public function kill_transaksi($id){
     $lol = Transaksi::find($id);
     $lol->delete();
+
+    $table = new LogActive;
+    $table->id_users = auth()->user()->id_pengguna;
+    $table->status = "Menghapus Data Transaksi";
+    $table->save();
     return back();
 }
 
 public function laporan_pemasukan(){
     $tabel = Transaksi_Detail::all();
-    return view('laporan_pemasukan',['lihat' => $tabel]);
+    $tabel2 = Pengeluaran::all();
+    return view('laporan_pemasukan',['lihat' => $tabel,'lihats'=>$tabel2]);
 }
 
 public function search_pemasukan(Request $req){
+    $tabel2 = Pengeluaran::all();
     $tanggalAwal = $req->dari;
     $tanggalAkhir = $req->sampai;
     $tabel = Transaksi_detail::whereBetween('tanggal_bayar',[$tanggalAwal,$tanggalAkhir])
@@ -386,13 +485,14 @@ public function search_pemasukan(Request $req){
     ->orWhere('tanggal_bayar',$tanggalAkhir)
     ->orWhere('total_bayar')
     ->get();
-    return view('laporan_pemasukan',['lihat'=>$tabel]);
+    return view('laporan_pemasukan',['lihat'=>$tabel,'lihats'=>$tabel2]);
 }
 
 public function cari_laporan_outlet(Request $req){
+    $tabel2 = Pengeluaran::all();
     $lol = $req->cari;
     $tabel = Transaksi_Detail::where('outlet_nama',$lol)->get();
-    return view('laporan_pemasukan',['lihat' => $tabel]);
+    return view('laporan_pemasukan',['lihat' => $tabel,'lihats'=>$tabel2]);
 }
 
 public function hapus_pemasukan($id){
@@ -410,7 +510,8 @@ public function riwayat_terakhir(){
     $tabel = Transaksi::all();
     $tabel2 = Transaksi_Detail::all();
     $tabel3 = Pengeluaran::all();
-    return view('dashboard',['lihat' => $tabel,'lihatz' => $tabel2, 'lihats'=>$tabel3]);
+    $tabel4 = LogActive::all();
+    return view('dashboard',['lihat' => $tabel,'lihatz' => $tabel2, 'lihats'=>$tabel3,'datas4' => $tabel4]);
 }
 
 
@@ -418,6 +519,7 @@ public function tambah_pengeluaran(Request $req){
         $tables = new Pengeluaran;
         $tables->hargaz = $req->harga;
         $tables->alasan = $req->alasan;
+        $tables->outlet_png = $req->outs;
         $tables->created_at = $req->tanggal;
         $tables->tanggal = $req->tanggal;
         $tables->save();
@@ -435,7 +537,8 @@ public function lihat_data_pengeluaran(){
 ##################################################################             PEMASUKAN                            ####################################################
 public function pemasukan(){
     $tabel2 = Transaksi_Detail::all();
-    return view('pemasukan',['lihatz' => $tabel2]);
+    $tabel3 = Pengeluaran::all();
+    return view('pemasukan',['lihatz' => $tabel2,'lihats'=>$tabel3]);
 }
 
 public function search_laporan_pemasukan(Request $req) {
@@ -450,4 +553,29 @@ public function search_laporan_pemasukan(Request $req) {
 
 
 ##################################################################             PEMASUKAN                            ####################################################
+
+
+public function data_outlet(){
+    $table = Outlet::all();
+    return view('laporan_pengeluaran',['data' => $table]);
+}
+
+##################################################################            PENGELUARAN                           ####################################################
+
+
+public function pengs_outs($id){
+    $table = Transaksi_Detail::where('outlet_nama',$id)->get();
+    $tabel2 = Pengeluaran::where('outlet_png', $id)->get();
+    $table3 = Outlet::find($id);
+    return view('laporan_pengeluaran_outlet',['lihat' => $table, 'pengeluaran' => $tabel2,'outlett' => $table3]);
+}
+
+##################################################################            PENGELUARAN                            ####################################################
+
+
+##################################################################            LOGAKTIVITAS                           ####################################################
+
+    
+
+##################################################################            LOGAKTIVITAS                           ####################################################
 }
